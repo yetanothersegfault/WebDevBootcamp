@@ -3,9 +3,9 @@ h1 {
 }
 
 li{
-	color: green;
+	color: rgb(0,255,0);
 }
 
 h4{
-	color: purple;
+	color: rgba(255,0,255,.7);
 }

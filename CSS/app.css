@@ -1,5 +1,10 @@
 h1 {
 	color: #FF8000;
+/*	border-color: purple;
+	border-width: 5px;
+	border-style: solid;*/ 
+
+	border: 5px solid purple;
 }
 
 li{
@@ -7,5 +12,12 @@ li{
 }
 
 h4{
-	color: rgba(255,0,255,.7);
+	background: rgb(255,100,80);
+}
+
+body{
+	background: pink;
+/*	background: url(https://i.pinimg.com/originals/b6/07/95/b60795007716db1797bf6245dda97361.jpg);
+	background-repeat: no-repeat;
+	background-size: cover;*/
 }

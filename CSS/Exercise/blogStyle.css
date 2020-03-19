@@ -1,0 +1,46 @@
+.body{
+	width: 50%;
+	border: 20px solid #7d8491;
+	margin: 20px auto;
+}
+
+p{
+	margin-left: 3%;
+	margin-right: 3%;
+	font-size: 16px;
+}
+
+.date{
+	font-size: 22px;
+	text-transform: uppercase;
+	color: #f2a541;
+	letter-spacing: 0.15em;
+}
+
+h2{
+	font-size: 34px;
+	font-weight: 500;
+	color: #4c5760;
+	margin-left: 3%;
+	margin-right: 3%;
+}
+
+.quote{
+	margin-left: 3%;
+	border-left: 8px solid #7d8491;
+	padding-left: 5px;
+	font-style: italic;
+}
+
+body{
+	background-color: #f0f7ee;
+	font-family: Rubik;
+}
+
+hr {
+    border: 0;
+    height: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    width: 95%;
+}

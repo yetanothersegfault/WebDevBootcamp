@@ -74,7 +74,7 @@ resetButton.addEventListener("click", function(){
 	//set the color display
 	colorDisplay.textContent = pickedColor;
 	//reset the heading to be the orginal color
-	h1.style.backgroundColor = "#232323"
+	h1.style.backgroundColor = "steelblue"
 	//remove message
 	messageDisplay.textContent = "";
 	//reset the button label

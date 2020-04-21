@@ -17,6 +17,31 @@ var messageDisplay = document.querySelector("#message");
 //get the h1 to be able to change the color when the user selects the correct option
 var h1 = document.querySelector("h1");
 
+//get the button to reset/play again
+var resetButton = document.querySelector("#reset");
+
+//set the button click to reset the game
+resetButton.addEventListener("click", function(){
+	//get new colors
+	colors = generateRandomColors(6);
+	//display the new colors
+	for(var i = 0; i < colors.length; i++)
+	{
+		colorSquares[i].style.backgroundColor = colors[i];
+	}
+	//get the new randomly picked color
+	pickedColor = pickColor();
+	//set the color display
+	colorDisplay.textContent = pickedColor;
+	//reset the heading to be the orginal color
+	h1.style.backgroundColor = "#232323"
+	//remove message
+	messageDisplay.textContent = "";
+	//reset the button label
+	resetButton.textContent = "New Colors";
+
+});
+
 for(var i = 0; i < colorSquares.length; i++)
 {
 	//set each square to a color
@@ -30,6 +55,7 @@ for(var i = 0; i < colorSquares.length; i++)
 		{
 			messageDisplay.textContent = "Correct!";
 			changeColors(clickedColor);
+			resetButton.textContent = "Play Again?";
 		}
 		else
 		{

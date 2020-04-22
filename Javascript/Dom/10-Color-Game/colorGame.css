@@ -61,6 +61,7 @@ button{
 	/* adding in other transitions for browser friendlyness */
 	-webkit-transition: all 0.3s;
 	-moz-transition: all 0.3s;
+	outline: none;
 }
 
 #message{

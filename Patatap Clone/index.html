@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Patatap Clone</title>
+
+	<link rel="stylesheet" href="circles.css">
+
+	<script type="text/javascript" src="paper-full.js"></script>
+	<script type="text/paperscript" canvas="myCanvas">
+		//create grid of circles
+		var radius = 10;
+		var circles = [];
+		for(var i = 0; i <= 1000; i += 100)
+		{
+			for(var j = 0; j <= 100; j += 100)
+			{
+				//create random colors
+				// var r = Math.floor(Math.random() * 256);
+				// var g = Math.floor(Math.random() * 256);
+				// var b = Math.floor(Math.random() * 256);
+				var circle = Path.Circle(new Point(i, j), radius);
+				circle.fillColor = new Color(255, 255, 255);
+				circles.push(circle);
+			}
+		}
+	</script>
+</head>
+<body>
+	<canvas id="myCanvas" resize></canvas>
+</body>
+</html>

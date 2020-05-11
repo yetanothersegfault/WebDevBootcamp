@@ -2,6 +2,16 @@
 	You fell in love with: <%= thingVar %>
 </h1>
 
+<% if(thingVar.toLowerCase() === "rusty"){ %>
+	<p>
+		Good Choice, Rusty is the BEST!!	
+	</p>
+<% } else { %>
+	<p>
+		Bad Choice! You should have said Rusty	
+	</p>
+<% } %>
+
 <p>
 	P.S. This is the love.ejs file!
 </p>

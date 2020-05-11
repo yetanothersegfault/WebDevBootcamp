@@ -1,13 +1,21 @@
 var express = require("express");
 var app = express();
 
+//get stylesheets
+app.use(express.static("public"));
+
+//this is just a shortcut of sorts
+//tell express that we will always give .ejs files
+app.set("view engine", "ejs");
+//now in any route we don't need to declare them as .ejs
+
 app.get("/", function(req, res){
-	res.render("home.ejs");
+	res.render("home");
 });
 
 app.get("/fallinlove/:thing", function(req, res){
 	var thing = req.params.thing;
-	res.render("love.ejs", {thingVar: thing});
+	res.render("love", {thingVar: thing});
 });
 
 app.get("/posts", function(req, res){
@@ -17,7 +25,7 @@ app.get("/posts", function(req, res){
 		{title: "Can you believe this Pomsky?", author: "Colt"}
 	];
 	
-	res.render("posts.ejs", {posts: posts});
+	res.render("posts", {posts: posts});
 });
 
 //Tell express to listen for requests (start the server)

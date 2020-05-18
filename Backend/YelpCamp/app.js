@@ -1,6 +1,20 @@
 //set up express
 const express = require("express");
 const app = express();
+
+//set up mongoose for Mongodb
+const mongoose = require("mongoose");
+mongoose.connect("mongodb://localhost:27017/yelp_camp", {useUnifiedTopology: true, useNewUrlParser: true});
+
+//set up database schema
+const campgroundSchema = new mongoose.Schema({
+	name: String,
+	image: String,
+	description: String
+});
+
+const Campground = mongoose.model("Campground", campgroundSchema);
+
 //const request = require("request");
 
 //set up the body parser
@@ -10,18 +24,6 @@ app.use(bodyParser.urlencoded({extended: true}));
 //get stylesheets
 app.use(express.static("public"));
 
-//setup temp array for campgrounds
-const campgrounds = [
-	{name: "Salmon Creek", image: "https://images.unsplash.com/photo-1471115853179-bb1d604434e0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1559&q=80"},
-	{name: "Foggy Peaks", image: "https://images.unsplash.com/photo-1545572695-789c1407474c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=668&q=80"}, 
-	{name: "Starry Forrest", image: "https://images.unsplash.com/photo-1539679121360-846d7d42d802?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2752&q=80"},
-	{name: "Salmon Creek", image: "https://images.unsplash.com/photo-1471115853179-bb1d604434e0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1559&q=80"},
-	{name: "Foggy Peaks", image: "https://images.unsplash.com/photo-1545572695-789c1407474c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=668&q=80"}, 
-	{name: "Starry Forrest", image: "https://images.unsplash.com/photo-1539679121360-846d7d42d802?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2752&q=80"},
-	{name: "Salmon Creek", image: "https://images.unsplash.com/photo-1471115853179-bb1d604434e0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1559&q=80"},
-	{name: "Foggy Peaks", image: "https://images.unsplash.com/photo-1545572695-789c1407474c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=668&q=80"}, 
-	{name: "Starry Forrest", image: "https://images.unsplash.com/photo-1539679121360-846d7d42d802?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2752&q=80"}
-]
 
 //set the view engine
 app.set("view engine", "ejs");
@@ -31,27 +33,65 @@ app.get("/", (req, res) => {
 	res.render("landing");
 });
 
+//INDEX ROUTE - show all campgrounds
 //lists all the campgrounds currently in system
 app.get("/campgrounds", (req, res) => {
-	res.render("campgrounds", {campgrounds: campgrounds});
+	//get all campgrounds from db
+	Campground.find({}, (err, campgrounds) => {
+		if(err)
+		{
+			//error
+			console.log(err);
+		}
+		else
+		{
+			//got all the campgrounds from the db
+			//pass them to the template to render
+			res.render("index", {campgrounds: campgrounds});
+		}
+	});
 });
 
+//NEW ROUTE - shows form
 //route to form that adds new campgrounds
 app.get("/campgrounds/new", (req, res) => {
 	res.render("new");
 });
 
+//CREATE ROUTE - add new campground to db
 //get a new campground entry
 app.post("/campgrounds", (req, res) => {
 	//get data from form
 	const campName = req.body.campName;
 	const url = req.body.imageURL;
+	const desc = req.body.campDesc;
 	
-	//add to campgrounds array
-	campgrounds.push({name: campName, image: url});
-	
-	//redirect to camgrounds page
-	res.redirect("/campgrounds");
+	//add to campground database
+	Campground.create({name: campName, image: url, description: desc}, (err, campground) => {
+		if(err){
+			console.log(err);
+		}
+		else {
+			console.log("Campground added: ");
+			console.log(campground);
+			//redirect to camgrounds page
+			res.redirect("/campgrounds");
+		}
+	});	
+});
+
+//SHOW ROUTE - show info about one campground
+app.get("/campgrounds/:id", (req, res) => {
+	//find campground with id
+	Campground.findById(req.params.id, (err, foundCampground) => {
+		if(err){
+			console.log(err)
+		}
+		else{
+			//render show template with that campground
+			res.render("show", {campground: foundCampground});
+		}
+	})
 });
 
 app.listen(3000, process.env.IP, () => {

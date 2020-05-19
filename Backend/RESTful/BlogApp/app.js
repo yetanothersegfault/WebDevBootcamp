@@ -58,6 +58,7 @@ app.post("/blogs", (req, res) => {
 		if(err)
 		{
 			console.log(err);
+			res.render("new");
 		}
 		else
 		{

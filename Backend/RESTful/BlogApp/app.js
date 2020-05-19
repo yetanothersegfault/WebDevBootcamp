@@ -7,7 +7,7 @@ const express = require("express"),
 //configure to use ejs
 app.set("view engine", "ejs")
 //configure to set up CSS folder
-app.use(express.static("static"));
+app.use(express.static("public"));
 //configure body parser
 app.use(bodyParser.urlencoded({extended: true}));
 
@@ -25,16 +25,47 @@ const blogSchema = new mongoose.Schema({
 //set up model for database
 const Blog = mongoose.model("Blog", blogSchema);
 
-//to create one database entry
-Blog.create({
-	title: "Test",
-	image: "https://images.unsplash.com/photo-1542435503-956c469947f6?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60", 
-	body: "This is a test"
-})
-
 //RESTful Routes
 
+//redirect root route to /blogs
+app.get("/", (req, res) => {
+	res.redirect("/blogs");
+});
+
 //Index route
+app.get("/blogs", (req, res) => {
+	//get all entries from the database
+	Blog.find({}, (err, blogs) => {
+		if(err)
+		{
+			console.log(err)
+		}
+		else
+		{
+			res.render("index", {blogs: blogs});
+		}
+	});
+});
+
+//New Route
+app.get("/blogs/new", (req, res) => {
+	res.render("new")
+})
+
+//Create Route
+app.post("/blogs", (req, res) => {
+	Blog.create(req.body.blog, (err, newBlog) => {
+		if(err)
+		{
+			console.log(err);
+		}
+		else
+		{
+			console.log(newBlog);
+			res.redirect("/blogs");
+		}
+	});
+});
 
 
 app.listen(3000, process.env.IP, () => {

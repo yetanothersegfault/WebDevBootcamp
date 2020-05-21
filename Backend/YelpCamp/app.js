@@ -6,14 +6,13 @@ const app = express();
 const mongoose = require("mongoose");
 mongoose.connect("mongodb://localhost:27017/yelp_camp", {useUnifiedTopology: true, useNewUrlParser: true});
 
-//set up database schema
-const campgroundSchema = new mongoose.Schema({
-	name: String,
-	image: String,
-	description: String
-});
+//DBs set up
+const Campground = require("./models/campground");
+const Comment = require("./models/comment")
 
-const Campground = mongoose.model("Campground", campgroundSchema);
+//seed file
+const seedDB = require("./seeds");
+seedDB();
 
 //const request = require("request");
 
@@ -23,7 +22,6 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 //get stylesheets
 app.use(express.static("public"));
-
 
 //set the view engine
 app.set("view engine", "ejs");
@@ -83,15 +81,16 @@ app.post("/campgrounds", (req, res) => {
 //SHOW ROUTE - show info about one campground
 app.get("/campgrounds/:id", (req, res) => {
 	//find campground with id
-	Campground.findById(req.params.id, (err, foundCampground) => {
+	Campground.findById(req.params.id).populate("comments").exec((err, foundCampground) => {
 		if(err){
 			console.log(err)
 		}
 		else{
+			console.log(foundCampground);
 			//render show template with that campground
 			res.render("show", {campground: foundCampground});
 		}
-	})
+	});
 });
 
 app.listen(3000, process.env.IP, () => {

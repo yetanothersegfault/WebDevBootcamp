@@ -59,6 +59,70 @@ router.post("/", isLoggedIn, (req, res) => {
 	});	
 });
 
+router.get("/:comment_id/edit", (req, res) => {
+	//get the campground
+	Campground.findById(req.params.id, (err, campground) => {
+		if(err)
+		{
+			console.log(err);
+			res.redirect("/campgrounds");
+		}
+		else
+		{
+			//get the comment from db
+			Comment.findById(req.params.comment_id, (err, comment) => {
+				if(err)
+				{
+					console.log(err);
+					res.redirect("/campgrounds/" + req.params.id);
+				}
+				else
+				{
+					//show the edit page
+					res.render("comments/edit", {comment: comment, campground: campground});
+				}
+			});
+		}
+	});
+})
+
+//UPDATE ROUTE - put request to take the info from the edit request
+router.put("/:comment_id", (req, res) => {
+	//find and update campground
+	Comment.findByIdAndUpdate(req.params.comment_id, req.body.comment, (err, updatedComment) => {
+		if(err)
+		{
+			console.log(err);
+			res.redirect("/campgrounds");
+		}
+		else
+		{
+			//redirect to campground page
+			res.redirect("/campgrounds/" + req.params.id);
+		}
+	});
+});
+
+//DESTROY ROUTE - removes a comment from the db
+router.delete("/:comment_id", (req, res) => {
+	Comment.findByIdAndRemove(req.params.comment_id, (err) => {
+		if(err)
+		{
+			console.log(err);
+			res.redirect("/campgrounds/" + req.params.id);
+		}
+		else
+		{
+			//go into which campground it is and delete the reference to the comment
+			Campground.findByIdAndUpdate(req.params.id, {$pullAll: {_id: req.params.comment_id}}, (err, campground) => {
+				console.log(campground);
+				res.redirect("/campgrounds/" + req.params.id);
+			});
+			
+		}
+	})
+});
+
 //check to see if the user is logged in
 function isLoggedIn(req, res, next){
 	if(req.isAuthenticated())

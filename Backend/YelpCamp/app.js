@@ -2,6 +2,10 @@
 const express = require("express");
 const app = express();
 
+//set up the method override for our put and delete request
+const methodOverride = require("method-override");
+app.use(methodOverride("_method"));
+
 //get routes
 const commentRoutes = require("./routes/comments"),
 	  campgroundRoutes = require("./routes/campgrounds"),
@@ -13,7 +17,7 @@ const passport = require("passport"),
 
 //set up mongoose for Mongodb
 const mongoose = require("mongoose");
-mongoose.connect("mongodb://localhost:27017/yelp_camp", {useUnifiedTopology: true, useNewUrlParser: true});
+mongoose.connect("mongodb://localhost:27017/yelp_camp", {useUnifiedTopology: true, useNewUrlParser: true, 'useFindAndModify': false});
 
 //DBs set up
 const Campground = require("./models/campground");

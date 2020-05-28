@@ -1,6 +1,7 @@
 const express = require("express"),
 	  router = express.Router(),
-	  Campground = require("../models/campground")
+	  Campground = require("../models/campground"),
+	  Comment = require("../models/comment");
 
 //INDEX ROUTE - show all campgrounds
 //lists all the campgrounds currently in system
@@ -47,7 +48,7 @@ router.post("/", isLoggedIn, (req, res) => {
 		else {
 			console.log("Campground added: ");
 			console.log(campground);
-			//redirect to camgrounds page
+			//redirect to campgrounds page
 			res.redirect("/campgrounds");
 		}
 	});	
@@ -67,6 +68,49 @@ router.get("/:id", (req, res) => {
 	});
 });
 
+//EDIT ROUTE - edit the campground
+router.get("/:id/edit", checkCampgroundOwnership, (req, res) => {
+	Campground.findById(req.params.id, (err, campground) => {
+		res.render("campgrounds/edit", {campground: campground});
+	});
+});
+
+//UPDATE ROUTE - put request to take the info from the edit request
+router.put("/:id", checkCampgroundOwnership, (req, res) => {
+	//find and update campground
+	Campground.findByIdAndUpdate(req.params.id, req.body.campground, (err, updatedCamp) => {
+		if(err)
+		{
+			console.log(err);
+			res.redirect("/campgrounds");
+		}
+		else
+		{
+			//redirect to campground page
+			res.redirect("/campgrounds/" + req.params.id);
+		}
+	});
+});
+
+//DESTROY ROUTE - removes a campground from the db
+router.delete("/:id", checkCampgroundOwnership, (req, res) => {
+	Campground.findByIdAndRemove(req.params.id, (err, campgroundRemoved) => {
+		if(err)
+		{
+			res.redirect("/campgrounds");
+		}
+		else
+		{
+			Comment.deleteMany({_id: { $in: campgroundRemoved.comments } }, (err) => {
+				if (err) {
+					console.log(err);
+				}
+				res.redirect("/campgrounds");
+			});
+		}
+	});
+});
+
 //check to see if the user is logged in
 function isLoggedIn(req, res, next){
 	if(req.isAuthenticated())
@@ -74,6 +118,38 @@ function isLoggedIn(req, res, next){
 		return next();
 	}
 	res.redirect("/login");
+}
+
+function checkCampgroundOwnership(req, res, next) {
+	//check to see if logged in
+	if(req.isAuthenticated())
+	{
+		Campground.findById(req.params.id, (err, campground) => {
+			if(err)
+			{
+				console.log(err);
+				res.redirect("back")
+			}
+			else
+			{
+				//is the user logged in the same as the user that created the campground
+				if(campground.author.id.equals(req.user._id))
+				{
+					next();
+				}
+				else
+				{
+					console.log("You do not have permission to do that");
+					res.redirect("back");
+				}
+			}
+		});
+	}
+	else
+	{
+		console.log("You need to be logged in to see that");
+		res.redirect("back");
+	}
 }
 
 module.exports = router;

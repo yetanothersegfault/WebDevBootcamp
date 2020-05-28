@@ -1,13 +1,14 @@
 const express = require("express"),
 	  router = express.Router({mergeParams: true}),
 	  Campground = require("../models/campground"),
-	  Comment = require("../models/comment")
+	  Comment = require("../models/comment"),
+	  middleware = require("../middleware");
 
 //=======================
 //COMMENT ROUTES
 
 //New Comment Route
-router.get("/new", isLoggedIn, (req, res) => {
+router.get("/new", middleware.isLoggedIn, (req, res) => {
 	//find campground from db
 	Campground.findById(req.params.id, (err, campground) => {
 		//check for err
@@ -23,7 +24,7 @@ router.get("/new", isLoggedIn, (req, res) => {
 });
 
 //Create Comment Route
-router.post("/", isLoggedIn, (req, res) => {
+router.post("/", middleware.isLoggedIn, (req, res) => {
 	//get campground from db
 	Campground.findById(req.params.id, (err, campground) => {
 		//check for error
@@ -59,7 +60,8 @@ router.post("/", isLoggedIn, (req, res) => {
 	});	
 });
 
-router.get("/:comment_id/edit", (req, res) => {
+//EDIT ROUTE - edits a comment
+router.get("/:comment_id/edit", middleware.checkCommentOwnership, (req, res) => {
 	//get the campground
 	Campground.findById(req.params.id, (err, campground) => {
 		if(err)
@@ -87,7 +89,7 @@ router.get("/:comment_id/edit", (req, res) => {
 })
 
 //UPDATE ROUTE - put request to take the info from the edit request
-router.put("/:comment_id", (req, res) => {
+router.put("/:comment_id", middleware.checkCommentOwnership, (req, res) => {
 	//find and update campground
 	Comment.findByIdAndUpdate(req.params.comment_id, req.body.comment, (err, updatedComment) => {
 		if(err)
@@ -104,7 +106,7 @@ router.put("/:comment_id", (req, res) => {
 });
 
 //DESTROY ROUTE - removes a comment from the db
-router.delete("/:comment_id", (req, res) => {
+router.delete("/:comment_id", middleware.checkCommentOwnership, (req, res) => {
 	Comment.findByIdAndRemove(req.params.comment_id, (err) => {
 		if(err)
 		{
@@ -115,7 +117,6 @@ router.delete("/:comment_id", (req, res) => {
 		{
 			//go into which campground it is and delete the reference to the comment
 			Campground.findById(req.params.id, (err, campground) => {
-				console.log(campground.comments);
 				campground.comments.remove(req.params.comment_id);
 				campground.save((err) => {
 					if(err)
@@ -130,18 +131,8 @@ router.delete("/:comment_id", (req, res) => {
 				});
 
 			});
-			//{$pullAll: {"comments": {_id: req.params.comment_id}}}, {safe: true, multi: true},
 		}
 	})
 });
-
-//check to see if the user is logged in
-function isLoggedIn(req, res, next){
-	if(req.isAuthenticated())
-	{
-		return next();
-	}
-	res.redirect("/login");
-}
 
 module.exports = router;

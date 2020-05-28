@@ -2,6 +2,10 @@
 const express = require("express");
 const app = express();
 
+//set up flash
+const flash = require("connect-flash");
+app.use(flash());
+
 //set up the method override for our put and delete request
 const methodOverride = require("method-override");
 app.use(methodOverride("_method"));
@@ -54,6 +58,8 @@ app.set("view engine", "ejs");
 //setup express with the user for each page
 app.use((req, res, next) => {
 	res.locals.currentUser = req.user;
+	res.locals.error = req.flash("error");
+	res.locals.success = req.flash("success");
 	next();
 });
 

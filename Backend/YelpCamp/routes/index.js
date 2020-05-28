@@ -23,9 +23,11 @@ router.post("/register", (req, res) => {
 		if(err)
 		{
 			console.log(err);
-			return res.render("register");
+			req.flash("error", err.message);
+			return res.redirect("/register");
 		}
 		passport.authenticate("local")(req, res, () => {
+			req.flash("success", "Welcome to YelpCamp " + newUser.username);
 			res.redirect("/campgrounds");
 		})
 	});
@@ -45,16 +47,8 @@ router.post("/login", passport.authenticate("local", {
 //logout route
 router.get("/logout", (req, res) => {
 	req.logout();
+	req.flash("success", "Logged Out!")
 	res.redirect("/campgrounds");
 })
-
-//check to see if the user is logged in
-function isLoggedIn(req, res, next){
-	if(req.isAuthenticated())
-	{
-		return next();
-	}
-	res.redirect("/login");
-}
 
 module.exports = router;

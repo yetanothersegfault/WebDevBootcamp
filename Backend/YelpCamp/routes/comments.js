@@ -114,11 +114,23 @@ router.delete("/:comment_id", (req, res) => {
 		else
 		{
 			//go into which campground it is and delete the reference to the comment
-			Campground.findByIdAndUpdate(req.params.id, {$pullAll: {_id: req.params.comment_id}}, (err, campground) => {
-				console.log(campground);
-				res.redirect("/campgrounds/" + req.params.id);
+			Campground.findById(req.params.id, (err, campground) => {
+				console.log(campground.comments);
+				campground.comments.remove(req.params.comment_id);
+				campground.save((err) => {
+					if(err)
+					{
+						console.log(err);
+						res.redirect("/campgrounds/" + req.params.id);
+					}
+					else
+					{
+						res.redirect("/campgrounds/" + req.params.id);
+					}
+				});
+
 			});
-			
+			//{$pullAll: {"comments": {_id: req.params.comment_id}}}, {safe: true, multi: true},
 		}
 	})
 });

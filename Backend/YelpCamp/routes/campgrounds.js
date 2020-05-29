@@ -36,13 +36,14 @@ router.post("/", middleware.isLoggedIn, (req, res) => {
 	const campName = req.body.campName,
 		  url = req.body.imageURL,
 		  desc = req.body.campDesc,
+		  price = req.body.campPrice,
 		  author = {
 			  id: req.user._id,
 			  username: req.user.username
 		  };
 	
 	//add to campground database
-	Campground.create({name: campName, image: url, description: desc, author: author}, (err, campground) => {
+	Campground.create({name: campName, price: price, image: url, description: desc, author: author}, (err, campground) => {
 		if(err){
 			console.log(err);
 		}
